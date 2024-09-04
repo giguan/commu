@@ -3,9 +3,15 @@
 import TextEditor from "@/app/components/TextEditor/page";
 import React, { useState } from "react";
 import { toast, Toaster } from 'react-hot-toast';
+import PostCategory from "../components/PostCatogory";
+import axios from "axios";
+import { useSession } from "next-auth/react";
 
 export default function PostForm() {
-  const [category, setCategory] = useState("일반");
+
+  const { data: session } = useSession();
+
+  const [category, setCategory] = useState<number | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -13,12 +19,34 @@ export default function PostForm() {
     e.preventDefault();
     // 여기서 API 호출이나 데이터 처리 로직을 추가하세요.
 
+    if (!category || !title || !content) {
+      toast.error('모든 필드를 입력하세요.');
+      return;
+    }
+
+    // 세션에서 id를 확인합니다.
+    if (!session?.user?.id) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+
+    const res = axios.post(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}/api/post/${category}`,{
+      title,
+      content,
+      authorId: session.user.id
+    })
+
     setTitle("");
     setContent("");
+
     toast.success('글 작성이 완료되었습니다!');
 
     console.log({ category, title, content });
   };
+
+  if(!session) {
+    return
+  }
 
   return (
     <>
@@ -31,20 +59,7 @@ export default function PostForm() {
 
     {/* 카테고리 선택 */}
     <div className="flex space-x-4 mb-4">
-        <button
-            type="button"
-            className={`py-2 px-4 rounded-md w-28 hover:bg-gray-400 ${category === "일반" ? "bg-gray-400 text-white" : "bg-gray-300 text-black"}`}
-            onClick={() => setCategory("일반")}
-        >
-            일반
-        </button>
-        <button
-            type="button"
-            className={`py-2 px-4 rounded-md w-28 hover:bg-gray-400 hover:text-white ${category === "뉴스" ? "bg-gray-400 text-white" : "bg-gray-300 text-black"}`}
-            onClick={() => setCategory("뉴스")}
-        >
-            뉴스
-        </button>
+        <PostCategory excludeAll={true} onCategorySelect={setCategory}  />
     </div>
 
     <form className="bg-white p-6 rounded-lg shadow-md space-y-4" onSubmit={handleSubmit}>
@@ -60,13 +75,7 @@ export default function PostForm() {
 
       {/* 내용 입력 */}
       <div className="border border-gray-300 rounded-md p-2">
-        {/* <textarea
-          placeholder="내용을 입력하세요"
-          className="w-full h-40 p-2 border-none focus:ring-0"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        ></textarea> */}
-        <TextEditor />
+        <TextEditor value={content} onChange={setContent} />
       </div>
 
       {/* 작성 버튼 */}

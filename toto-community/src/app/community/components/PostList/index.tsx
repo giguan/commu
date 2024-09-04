@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { posts, Post } from "../../data/posts";
+import PostCategory from "../PostCatogory";
 
 const PostList = () => {
   const router = useRouter();
 
   const [selectedTab, setSelectedTab] = useState("전체");
 
-  const tabs = ["전체", "일반", "뉴스"];
+  const [category, setCategory] = useState<number | null>(null);
 
   return (
     <>
@@ -26,19 +27,7 @@ const PostList = () => {
             <div className="container mx-auto max-w-screen-xl">
 
                 <div className="flex space-x-4 mb-4">
-                {tabs.map((tab) => (
-                    <button
-                    key={tab}
-                    onClick={() => setSelectedTab(tab)}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold focus:outline-none w-40 ${
-                        selectedTab === tab
-                        ? "bg-[#B5B9C1] text-white font-bold"
-                        : "bg-[#D5D8DF] text-gray-100 font-bold"
-                    }`}
-                    >
-                    {tab}
-                    </button>
-                ))}
+                    <PostCategory onCategorySelect={setCategory}  />
                 </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow-md">

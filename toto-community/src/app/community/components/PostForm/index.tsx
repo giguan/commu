@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import React, { useState } from "react";
 
 export default function PostForm() {
@@ -9,7 +10,9 @@ export default function PostForm() {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // 여기서 API 호출이나 데이터 처리 로직을 추가하세요.
+    
+    const res = axios.post(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}/api/post/`)
+
     console.log({ category, title, content });
   };
 

@@ -1,32 +1,26 @@
 "use client"
 
 import Link from "next/link"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast, Toaster } from "react-hot-toast"
 
+import { signOut, useSession } from "next-auth/react";
+import LoginForm from "../LoginForm";
+import ChatList from "../ChatList";
+
+
 const Aside = () => {
-
-    const [loginCheck, setLoginCheck] = useState(false)
-
-    const handleLogin = useCallback(() => {
-      setLoginCheck((prev) => !prev);
-
-      if(loginCheck) {
-        toast.success('안녕히가세요 관리자님')
-      } else {
-        toast.success('안녕하세요 관리자님')
-      }
-
-    }, [loginCheck])
+  const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
 
     return (
 
         <div className="lg:w-[30%] flex-shrink-0 space-y-4 mb-6 lg:mb-0">
           <Toaster position="top-center" />
           {
-            loginCheck ? 
+            session ? 
               <div className="bg-white p-4 rounded-lg shadow-inner">
-                <h2 className="text-lg font-bold text-black mb-4">관리자 님</h2>
+                <h2 className="text-lg font-bold text-black mb-4">{session.user?.name}</h2>
                 <ul className="text-sm text-gray-600 mb-4">
                   <li>포인트 0점</li>
                   <li>게시글 0개</li>
@@ -36,7 +30,9 @@ const Aside = () => {
                 </ul>
                 <div className="flex space-x-4">
                   <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md">
-                    정보수정
+                    <Link href={'/Userinfo'}>
+                      정보수정
+                    </Link>
                   </button>
                   <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md">
                     나의 활동
@@ -45,87 +41,20 @@ const Aside = () => {
                 <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md mt-2">
                   관리자
                 </button>
-                <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md mt-2" onClick={handleLogin}>
+                <button 
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md mt-2"
+                >
                   로그아웃
                 </button>
               </div>
               :
-              <div className="bg-gray-100 p-2 rounded-lg">
-                <input
-                  type="text"
-                  placeholder="아이디 또는 이메일"
-                  className="w-full p-3 text-black font-semibold mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-main"
-                />
-                <input
-                  type="password"
-                  placeholder="비밀번호"
-                  className="w-full p-3 text-black font-semibold mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-main"
-                />
-                <button className="w-full  bg-gray-700 text-white p-3 rounded-md" onClick={handleLogin}>
-                  로그인
-                </button>
-                <div className="flex justify-between mt-4 text-xs text-gray-400">
-                  <Link href="/find-password" className="hover:text-primary-main">
-                    비밀번호 찾기
-                  </Link>
-                  <Link href="/signup" className="hover:text-primary-main">
-                    회원가입
-                  </Link>
-                </div>
-              </div>
-          
+              <LoginForm />
           }
 
           {/* 실시간 채팅 위젯 */}
-          <div className="bg-white p-4 rounded-lg shadow-inner">
-            <h3 className="text-lg font-bold text-black mb-2">실시간채팅 (2)</h3>
-            <p className="text-xs text-grayscale-400 mb-2">2024. 8. 29.</p>
-            <div className="space-y-2 overflow-y-auto max-h-80 p-1 rounded-md">
-              
-              <p className="text-xs text-gray-500">
-                <span className="text-green-500 font-bold ml-1">4 빠르밍</span> 04:00:10
-              </p>
-              <div className="bg-[#F2F2F2] p-2 rounded-lg shadow">
-                <p className="text-xs text-black">스토리지도 더 늘어났던데, 용량 걱정 덜겠음 ㅋㅋ</p>
-              </div>
-
-
-              <p className="text-xs text-gray-500">
-                <span className="text-orange-500 font-bold ml-1">5 달타령</span> 04:00:10
-              </p>
-              <div className="bg-[#F2F2F2] p-2 rounded-lg shadow">
-                <p className="text-xs text-black">맞음요, 1TB 모델도 나왔잖아요ㅎㅎ</p>
-              </div>
-
-              <p className="text-xs text-gray-500">
-                <span className="text-orange-500 font-bold ml-1">5 달타령</span> 04:00:10
-              </p>
-              <div className="bg-[#F2F2F2] p-2 rounded-lg shadow">
-                <p className="text-xs text-black">맞음요, 1TB 모델도 나왔잖아요ㅎㅎ</p>
-              </div>
-
-              <p className="text-xs text-gray-500">
-                <span className="text-orange-500 font-bold ml-1">5 달타령</span> 04:00:10
-              </p>
-              <div className="bg-[#F2F2F2] p-2 rounded-lg shadow">
-                <p className="text-xs text-black">맞음요, 1TB 모델도 나왔잖아요ㅎㅎ</p>
-              </div>
-
-              <p className="text-xs text-gray-500">
-                <span className="text-orange-500 font-bold ml-1">5 달타령</span> 04:00:10
-              </p>
-              <div className="bg-[#F2F2F2] p-2 rounded-lg shadow">
-                <p className="text-xs text-black">맞음요, 1TB 모델도 나왔잖아요ㅎㅎ</p>
-              </div>
-            </div>
-            
-            <input
-              type="text"
-              placeholder="메시지를 입력하세요"
-              className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-[#E9EBF1] text-sm text-black"
-            />
-
-          </div>
+          <ChatList />
+          
 
           {/* 자유게시판 위젯 */}
           <div className="bg-white p-4 rounded-lg shadow-md">

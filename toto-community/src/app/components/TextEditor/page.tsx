@@ -7,26 +7,18 @@ import "react-quill/dist/quill.snow.css";
 // Quill을 동적으로 로드합니다.
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
-const TextEditor = () => {
-  const [value, setValue] = useState("");
+interface TextEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
 
-  const insertHtml = () => {
-    const editor = document.querySelector('.ql-editor');
-    if (editor) {
-      editor.innerHTML += "<p><strong>이것은 HTML 코드로 삽입된 텍스트입니다.</strong></p>";
-    }
-  };
-
-  const logHtml = () => {
-    console.log(value);
-  };
-
+const TextEditor = ({ value, onChange }: TextEditorProps) => {
   return (
     <div>
       <ReactQuill
         theme="snow"
         value={value}
-        onChange={setValue}
+        onChange={onChange} // 부모로부터 받은 onChange 핸들러를 사용
         modules={{
           toolbar: [
             [{ header: '1'}, { header: '2'}, { font: [] }],
@@ -35,7 +27,7 @@ const TextEditor = () => {
             [{'list': 'ordered'}, {'list': 'bullet'}, 
             {'indent': '-1'}, {'indent': '+1'}],
             ['link', 'image', 'video'],
-            ['clean']  
+            ['clean']
           ],
           clipboard: {
             matchVisual: false,
@@ -48,12 +40,6 @@ const TextEditor = () => {
           'link', 'image', 'video'
         ]}
       />
-      {/* <button onClick={insertHtml} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">
-        HTML 코드 삽입
-      </button>
-      <button onClick={logHtml} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">
-        HTML 코드 출력
-      </button> */}
     </div>
   );
 };

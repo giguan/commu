@@ -148,7 +148,7 @@ export default function Home() {
             <p className="text-sm text-gray-600">
               🎉 이렇게 만들어도 훨씬 더 이쁜 듯. 🎉
               <br />
-              테스트를 위한 관리자 계정은 <strong>admin / 123</strong> 입니다.
+              테스트를 위한 관리자 계정은 <strong>admin / 123456</strong> 입니다.
             </p>
           </div>
 
