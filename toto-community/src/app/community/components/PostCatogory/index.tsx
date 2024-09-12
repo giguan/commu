@@ -13,11 +13,18 @@ interface Category {
 interface PostCategoryProps {
   excludeAll?: boolean; // 전체 카테고리를 제외할지 결정하는 prop
   onCategorySelect?: (categoryId: number) => void; // 선택한 카테고리의 id를 전달
+  selectedCategory?: number | null; // 선택된 카테고리, 있을 수도 없을 수도 있음
 }
 
-const PostCategory = ({ excludeAll = false, onCategorySelect }: PostCategoryProps) => {
+const PostCategory = ({
+  excludeAll = false,
+  onCategorySelect,
+  selectedCategory,
+}: PostCategoryProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    selectedCategory ?? null // selectedCategory가 있으면 초기값으로 설정
+  );
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -34,8 +41,8 @@ const PostCategory = ({ excludeAll = false, onCategorySelect }: PostCategoryProp
 
         setCategories(fetchedCategories);
 
-        // 첫 번째 카테고리를 기본 선택
-        if (fetchedCategories.length > 0) {
+        // selectedCategory가 없으면 첫 번째 카테고리를 기본 선택
+        if (!selectedCategory && fetchedCategories.length > 0) {
           setSelectedCategoryId(fetchedCategories[0].id);
           if (onCategorySelect) {
             onCategorySelect(fetchedCategories[0].id);
@@ -47,7 +54,7 @@ const PostCategory = ({ excludeAll = false, onCategorySelect }: PostCategoryProp
     };
 
     fetchCategories();
-  }, [excludeAll]);
+  }, [excludeAll, selectedCategory, onCategorySelect]);
 
   const handleCategorySelect = (id: number) => {
     setSelectedCategoryId(id);

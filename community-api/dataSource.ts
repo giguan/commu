@@ -6,6 +6,9 @@ import { Board } from './src/entities/Board';
 import { Comment } from './src/entities/Comment';
 import { runSeeders } from 'typeorm-extension';
 import { ExpRewardSettings } from './src/entities/ExpRewardSettings';
+import { Reaction } from '@entities/Reaction';
+import { ImageEntity } from '@entities/Image';
+import { ImageDetailEntity } from '@entities/Image-detail';
 
 dotenv.config();
 
@@ -16,10 +19,19 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [User, Post, Board, Comment, ExpRewardSettings],
-  migrations: [__dirname + '/migrations/*.ts'],
+  entities: [
+    User,
+    Post,
+    Board,
+    Comment,
+    ExpRewardSettings,
+    Reaction,
+    ImageEntity,
+    ImageDetailEntity,
+  ],
+  migrations: ['./src/migrations/*.ts'],
   //migrationsRun: true,
-  synchronize: false,
+  synchronize: true,
   logging: true,
   charset: 'utf8mb4_general_ci',
 });

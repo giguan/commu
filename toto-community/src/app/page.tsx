@@ -1,119 +1,21 @@
-"use client"
-
-import { getDisplayName } from "next/dist/shared/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import MobileMenu from "./components/MobileMenu";
+import SwiperWiget from "./components/SwiperWiget";
+import PostWidget from "./components/PostWidget";
+import { fetchComments, fetchPosts } from "./utils/queryHelpers";
 
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 
-const games = [
-  {
-    teamA: { name: '한화', score: 0, logo: '/logo/sports/kbo/hanwha.png' },
-    teamB: { name: '롯데', score: 5, logo: '/logo/sports/kbo/lotte.png' },
-    inning: '4회초',
-  },
-  {
-    teamA: { name: 'KT', score: 3, logo: '/logo/sports/kbo/kt.png' },
-    teamB: { name: 'LG', score: 5, logo: '/logo/sports/kbo/lg.png' },
-    inning: '6회말',
-  },
-  {
-    teamA: { name: '두산', score: 2, logo: '/logo/sports/kbo/doosan.png' },
-    teamB: { name: 'NC', score: 4, logo: '/logo/sports/kbo/nc.png' },
-    inning: '7회초',
-  },
-  {
-    teamA: { name: 'SSG', score: 7, logo: '/logo/sports/kbo/ssg.png' },
-    teamB: { name: 'KIA', score: 4, logo: '/logo/sports/kbo/kia.png' },
-    inning: '7회초',
-  },
-  {
-    teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-    teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-    inning: '8회초',
-  },
-  {
-    teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-    teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-    inning: '8회초',
-  },
-  {
-    teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-    teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-    inning: '8회초',
-  },
-  {
-    teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-    teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-    inning: '8회초',
-  },
-];
+export default async function Home() {
 
-export default function Home() {
-  const [isOpen, setIsOpen] = useState(false);
+  // 서버에서 데이터를 prefetch
+  const posts = await fetchPosts();
 
   return (
-        <div id="b" className="lg:flex-grow space-y-6" style={{width: '100%'}}>
+        <div className="lg:flex-grow space-y-6" style={{width: '100%'}}>
           
           {/* 야구 일정 위젯 */}
-          <div className="relative bg-gray-100 p-4 rounded-lg mb-32">
-            <div className="absolute top-0 left-0 right-0 mx-auto h-[200px] w-full max-w-7xl">
-              <Swiper
-                  modules={[Navigation, Pagination, Autoplay]} 
-                  spaceBetween={10}
-                  slidesPerView={5}
-                  breakpoints={{
-                      340: {
-                        slidesPerView: 2,
-                      },
-                      640: {
-                          slidesPerView: 2,
-                      },
-                      768: {
-                          slidesPerView: 3,
-                      },
-                      1024: {
-                          slidesPerView: 5,
-                      },
-                  }}
-                  // navigation
-                  // pagination={{ clickable: true }}
-                  loop={true}
-                  // navigation
-                  autoplay={{ 
-                    delay: 3000, // 슬라이드가 자동으로 넘어가는 시간 (밀리초)
-                }}
-              >
-              {games.map((game, index) => (
-                <SwiperSlide key={index}>
-                  <div className="p-4 bg-gray-300 rounded-lg shadow-md text-center">
-                    <div className="mb-2 text-sm font-bold">KBO</div>
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex flex-col items-center">
-                        <Image src={game.teamA.logo} alt={game.teamA.name} width={30} height={30} />
-                        <span className="text-xs mt-1">{game.teamA.name}</span>
-                      </div>
-                      <div className="text-xl font-bold whitespace-nowrap">
-                        {game.teamA.score} <span className="mx-2">VS</span> {game.teamB.score}
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <Image src={game.teamB.logo} alt={game.teamB.name} width={30} height={30} />
-                        <span className="text-xs mt-1">{game.teamB.name}</span>
-                      </div>
-                    </div>
-                    <div className="text-red-500 text-xs">{game.inning}</div>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-            </div>
-          </div>
-
+          <SwiperWiget/>
 
         <div className="lg:w-full space-y-6">
           {/* 배너 영역 */}
@@ -155,79 +57,8 @@ export default function Home() {
           {/* 자유게시판 및 갤러리 위젯들 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 자유게시판 위젯 */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-black">자유게시판</h2>
-                <Link href="/community" className="text-primary-main">
-                  더보기
-                </Link>
-              </div>
-              <ul className="text-sm text-gray-600 space-y-2">
-                <li className="border-b border-gray-200 py-2 flex justify-between">
-                  <div>
-                    <span className="bg-grayscale-200 text-gray-700 text-xs px-2 py-1 rounded-lg mr-2 font-semibold">일반</span>
-                    <Link href="/community/1" className="text-xs font-semibold hover:text-primary-main">
-                      애플 키보드 트랙패드 기타 구입
-                    </Link>
-                    <span className="text-red-500 text-xs font-bold ml-2">N</span>
-                  </div>
-                  
-                  <span className="block text-xs text-gray-400 mt-1">
-                    2024.08.29
-                  </span>
-                </li>
-
-                <li className="border-b border-gray-200 py-2 flex justify-between">
-                  <div>
-                    <span className="bg-grayscale-200 text-gray-700 text-xs px-2 py-1 rounded-lg mr-2 font-semibold">일반</span>
-                    <Link href="/community/1" className="text-xs font-semibold hover:text-primary-main">
-                    애플티비가 은근히 볼게 많습니다
-                    </Link>
-                    <span className="text-red-500 text-xs font-bold ml-2">N</span>
-                  </div>
-                  <span className="block text-xs text-gray-400 mt-1">
-                    2024.08.29
-                  </span>
-                </li>
-
-                <li className="border-b border-gray-200 py-2 flex justify-between">
-                  <div>
-                    <span className="bg-grayscale-200 text-gray-700 text-xs px-2 py-1 rounded-lg mr-2 font-semibold">일반</span>
-                    <Link href="/community/1" className="text-xs font-semibold hover:text-primary-main">
-                    아이폰 14 프로 맥스 팀 퍼플
-                    </Link>
-                  </div>
-                  <span className="block text-xs text-gray-400 mt-1">
-                    2024.08.29
-                  </span>
-                </li>
-
-                <li className="border-b border-gray-200 py-2 flex justify-between">
-                  <div>
-                    <span className="bg-grayscale-200 text-gray-700 text-xs px-2 py-1 rounded-lg mr-2 font-semibold">일반</span>
-                    <Link href="/community/1" className="text-xs font-semibold hover:text-primary-main">
-                    블룸버그 밤 맥 프로, 아이맥 프로, 맥 미니
-                    </Link>
-                  </div>
-                  <span className="block text-xs text-gray-400 mt-1">
-                    2024.08.29
-                  </span>
-                </li>
-
-                <li className="border-b border-gray-200 py-2 flex justify-between">
-                  <div>
-                    <span className="bg-grayscale-200 text-gray-700 text-xs px-2 py-1 rounded-lg mr-2 font-semibold">뉴스</span>
-                    <Link href="/community/1" className="text-xs font-semibold hover:text-primary-main">
-                    스튜디오 듀오와 데스크셋업
-                    </Link>
-                  </div>
-                  <span className="block text-xs text-gray-400 mt-1">
-                    2024.08.29
-                  </span>
-                </li>
-              </ul>
-            </div>
-
+                <PostWidget initialPosts={posts} />
+            
             {/* 갤러리 위젯 */}
             <div className="bg-white p-4 rounded-lg shadow-md">
               <div className="flex justify-between items-center">
@@ -511,95 +342,7 @@ export default function Home() {
           
 
       {/* 모바일 메뉴 버튼 */}
-      <div className="lg:hidden p-4">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="bg-primary-main text-white p-2 rounded-md w-full"
-        >
-          메뉴 열기
-        </button>
-      </div>
-
-      {/* 모바일 메뉴 */}
-      {isOpen && (
-        <div className="lg:hidden bg-white p-4 rounded-lg shadow-md">
-          <nav className="space-y-2">
-            <Link href="/" className="block text-gray-800 hover:text-primary-main">
-              홈
-            </Link>
-            <Link href="/about" className="block text-gray-800 hover:text-primary-main">
-              소개
-            </Link>
-            <Link href="/contact" className="block text-gray-800 hover:text-primary-main">
-              연락처
-            </Link>
-          </nav>
-        </div>
-      )}
+      <MobileMenu/>
     </div>
-  );
-}
-
-
-
-export function SportsSchedule() {
-  const games = [
-    {
-      teamA: { name: '한화', score: 0, logo: '/logo/sports/kbo/hanwha.png' },
-      teamB: { name: '롯데', score: 5, logo: '/logo/sports/kbo/lotte.png' },
-      inning: '4회초',
-    },
-    {
-      teamA: { name: 'KT', score: 3, logo: '/logo/sports/kbo/kt.png' },
-      teamB: { name: 'LG', score: 5, logo: '/logo/sports/kbo/lg.png' },
-      inning: '6회말',
-    },
-    {
-      teamA: { name: '두산', score: 2, logo: '/logo/sports/kbo/doosan.png' },
-      teamB: { name: 'NC', score: 4, logo: '/logo/sports/kbo/nc.png' },
-      inning: '7회초',
-    },
-    {
-      teamA: { name: 'SSG', score: 7, logo: '/logo/sports/kbo/ssg.png' },
-      teamB: { name: 'KIA', score: 4, logo: '/logo/sports/kbo/kia.png' },
-      inning: '7회초',
-    },
-    {
-      teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-      teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-      inning: '8회초',
-    },
-    {
-      teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-      teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-      inning: '8회초',
-    },
-    {
-      teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-      teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-      inning: '8회초',
-    },
-    {
-      teamA: { name: '삼성', score: 0, logo: '/logo/sports/kbo/samsung.png' },
-      teamB: { name: '키움', score: 0, logo: '/logo/sports/kbo/kiwoom.png' },
-      inning: '8회초',
-    },
-  ];
-
-  return (
-    <Swiper
-      spaceBetween={10} // 슬라이드 간 간격을 10px로 설정
-      slidesPerView={1} // 한 줄에 5개의 슬라이드가 보이도록 설정
-      navigation
-      pagination={{ clickable: true }}
-      loop={true} 
-      style={{ width: '100%' }}
-    >
-      {games.map((game, index) => (
-        <SwiperSlide key={index}>
-            <div style={{backgroundColor: 'red'}}>sss</div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
   );
 }

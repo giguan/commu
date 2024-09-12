@@ -8,6 +8,7 @@ import {
 import { User } from './User';
 import { Board } from './Board';
 import { Comment } from './Comment';
+import { Reaction } from './Reaction';
 
 @Entity()
 export class Post {
@@ -17,7 +18,7 @@ export class Post {
   @Column()
   title: string;
 
-  @Column('text')
+  @Column('longtext')
   content: string;
 
   @Column({ default: 0 })
@@ -25,6 +26,12 @@ export class Post {
 
   @Column({ default: 0 })
   dislikes: number;
+
+  @Column({ default: 0 })
+  views: number;
+
+  @Column({ default: false })
+  deleteYn: boolean;
 
   @ManyToOne(() => User, (user) => user.posts)
   author: User; // 작성자와 연결
@@ -38,6 +45,6 @@ export class Post {
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
+  @OneToMany(() => Reaction, (reaction) => reaction.post) // 새로운 관계 추가
+  reactions: Reaction[];
 }

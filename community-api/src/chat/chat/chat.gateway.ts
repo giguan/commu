@@ -64,6 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message', {
       username: message.username || 'Guest',
       text: message.text,
+      time: currentTime,
     });
   }
 }

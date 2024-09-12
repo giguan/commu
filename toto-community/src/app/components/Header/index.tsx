@@ -20,10 +20,10 @@ export default function Header() {
           {/* 네비게이션 링크 (웹용) */}
           <div className="hidden md:flex space-x-6">
             <Link href="/features" className="text-lg font-medium font-semibold text-black hover:text-primary-main">
-                공식보증업체
+                #1
             </Link>
             <Link href="/customers" className="text-lg font-medium font-semibold text-black hover:text-primary-main">
-                먹튀검증
+                #2
             </Link>
             <Link href="/themes" className="text-lg font-medium font-semibold text-black hover:text-primary-main">
                 스포츠분석
@@ -32,13 +32,13 @@ export default function Header() {
                 커뮤니티
             </Link>
             <Link href="/bookmark" className="text-lg font-medium font-semibold text-black hover:text-primary-main">
-                홍보센터
+                #5
             </Link>
             <Link href="community" className="text-lg font-medium font-semibold text-black hover:text-primary-main">
-                포인트존
+                #6
             </Link>
             <Link href="/blog" className="text-lg font-medium font-semibold text-black hover:text-primary-main">
-                고객센터
+                #70
             </Link>
           </div>
 

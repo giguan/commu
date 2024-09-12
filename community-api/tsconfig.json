@@ -20,7 +20,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@entities/*": ["src/entities/*"],
-      "@seed/*": ["src/seed/*"]
+      "@seed/*": ["src/seed/*"],
     }
   }
 }

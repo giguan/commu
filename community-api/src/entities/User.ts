@@ -1,6 +1,7 @@
 import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
 import { Post } from './Post';
 import { Comment } from './Comment';
+import { Reaction } from './Reaction';
 
 @Entity()
 export class User {
@@ -29,6 +30,9 @@ export class User {
   @Column({ default: 0 })
   experience: number;
 
+  @Column({ default: 1 })
+  level: number;
+
   @Column({ default: false })
   isAdmin: boolean;
 
@@ -44,9 +48,15 @@ export class User {
   @Column({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
+  //사용자 IP,
+
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
 
-  @OneToMany(() => Comment, (comment) => comment.author, { cascade: true })
+  // 사용자가 작성한 댓글들
+  @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.post) // 새로운 관계 추가
+  reactions: Reaction[];
 }

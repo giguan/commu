@@ -16,4 +16,10 @@ export class ExpRewardSettings {
 
   @Column({ default: 10 }) // 기본 댓글 작성 경험치
   commentExp: number;
+
+  @Column({ default: 100 }) // 기본 1레벨에서 2레벨로 가기 위한 경험치
+  baseExpForLevelUp: number;
+
+  @Column({ default: 1.5 }) // 레벨별 경험치 상승 비율
+  levelMultiplier: number;
 }

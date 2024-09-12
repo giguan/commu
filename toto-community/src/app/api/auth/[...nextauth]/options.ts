@@ -8,7 +8,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 type UserResponse = {
   id: string;
-  nickname: string;
   email: string;
   password: string;
   points: number;
@@ -18,6 +17,7 @@ type UserResponse = {
   isAdmin: boolean;
   isEmailVerified: boolean;
   updatedAt: Date;
+  nickname: string;
 };
 
 export const authOptions: any = {
@@ -50,8 +50,6 @@ export const authOptions: any = {
             });
             user = response.data;
 
-            console.log(user)
-
           } catch (error) {
             throw new Error("사용자를 찾을 수 없습니다.");
           }
@@ -69,7 +67,7 @@ export const authOptions: any = {
           // 사용자가 인증되면 사용자 객체를 반환합니다.
           return { 
             id: user.id,
-            name: user.nickname,
+            nickname: user.nickname,
             email: user.email,
             points: user.points,
             postCount: user.postCount,
@@ -91,7 +89,7 @@ export const authOptions: any = {
     callbacks: {
       async session({ session, token }: { session: any, token: any}) {
         session.user.id = token.id;
-        session.user.name = token.name;
+        session.user.nickname = token.nickname;
         session.user.email = token.email;
         session.user.points = token.points;
         session.user.postCount = token.postCount;
@@ -103,10 +101,10 @@ export const authOptions: any = {
   
         return session;
       },
-      async jwt({ token, user }: { token: any, user: any }) {
+      async jwt({ token, user }: { token: any, user: UserResponse }) {
         if (user) {
           token.id = user.id;
-          token.name = user.name;
+          token.nickname = user.nickname;
           token.email = user.email;
           token.points = user.points;
           token.postCount = user.postCount;
@@ -119,5 +117,13 @@ export const authOptions: any = {
         return token;
       },
     },
+    session: {
+      strategy: "jwt",
+      maxAge: 60 * 60, // 1시간 (3600초)
+    },
+    jwt: {
+      maxAge: 60 * 60, // 1시간 (3600초)
+    },
+
     debug: true,
   };

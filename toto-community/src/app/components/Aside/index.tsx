@@ -1,56 +1,26 @@
-"use client"
-
 import Link from "next/link"
-import { useCallback, useEffect, useState } from "react"
-import { toast, Toaster } from "react-hot-toast"
+import { Toaster } from "react-hot-toast"
+// import ChatList from "../ChatList";
+// import RecentPostAndComment from "../RecentPostAndComment";
+// import UserInfo from "../UserInfo";
+import { fetchComments, fetchPosts } from "@/app/utils/queryHelpers";
+import dynamic from "next/dynamic";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { signOut, useSession } from "next-auth/react";
-import LoginForm from "../LoginForm";
-import ChatList from "../ChatList";
+const ChatList = dynamic(() => import("../ChatList"), { ssr: false });
+const RecentPostAndComment = dynamic(() => import("../RecentPostAndComment"), { ssr: false });
+const UserInfo = dynamic(() => import("../UserInfo"), { ssr: false });
 
+export default async function Aside () {
 
-const Aside = () => {
-  const { data: session, status } = useSession();
-  const [mounted, setMounted] = useState(false);
+    const posts = await fetchPosts()
+    const comments = await fetchComments()
 
     return (
 
         <div className="lg:w-[30%] flex-shrink-0 space-y-4 mb-6 lg:mb-0">
           <Toaster position="top-center" />
-          {
-            session ? 
-              <div className="bg-white p-4 rounded-lg shadow-inner">
-                <h2 className="text-lg font-bold text-black mb-4">{session.user?.name}</h2>
-                <ul className="text-sm text-gray-600 mb-4">
-                  <li>포인트 0점</li>
-                  <li>게시글 0개</li>
-                  <li>댓글 0개</li>
-                  <li>쪽지 0개</li>
-                  <li>저장한 글 0개</li>
-                </ul>
-                <div className="flex space-x-4">
-                  <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md">
-                    <Link href={'/Userinfo'}>
-                      정보수정
-                    </Link>
-                  </button>
-                  <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md">
-                    나의 활동
-                  </button>
-                </div>
-                <button className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md mt-2">
-                  관리자
-                </button>
-                <button 
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="w-full bg-[#f5f6f9] text-[#697183] p-2 rounded-md mt-2"
-                >
-                  로그아웃
-                </button>
-              </div>
-              :
-              <LoginForm />
-          }
+          <UserInfo/>
 
           {/* 실시간 채팅 위젯 */}
           <ChatList />
@@ -115,106 +85,8 @@ const Aside = () => {
           </div>
 
           {/* 새 글 및 새 댓글 위젯 */}
-          <NewPostsComments/>
+          <RecentPostAndComment initialPosts={posts} initialComments={comments}/>
 
         </div>
     )
 }
-
-export function NewPostsComments() {
-    const [activeTab, setActiveTab] = useState('newPosts');
-  
-    return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <div className="flex border-b border-gray-200">
-          <button
-            className={`w-1/2 text-center py-2 font-semibold ${activeTab === 'newPosts' ? 'text-red-500 border-b-2 border-red-500' : 'text-black'}`}
-            onClick={() => setActiveTab('newPosts')}
-          >
-            새 글
-          </button>
-          <button
-            className={`w-1/2 text-center py-2 font-semibold ${activeTab === 'newComments' ? 'text-red-500 border-b-2 border-red-500' : 'text-black'}`}
-            onClick={() => setActiveTab('newComments')}
-          >
-            새 댓글
-          </button>
-        </div>
-        <div className="mt-4">
-          {activeTab === 'newPosts' && (
-            <ul className="text-sm space-y-2">
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[맛집]</span> 
-                  <span className="text-black ml-1 truncate">부모님 생신 기념 오마카세 방문 후기 🍣</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[맛집]</span> 
-                  <span className="text-black ml-1 truncate">무지개 떡 크레이프 카페에서 생일 케이크 🍰</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[맛집]</span> 
-                  <span className="text-black ml-1 truncate">삼겹살 제대로 먹을 수 있는 곳!</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[맛집]</span> 
-                  <span className="text-black ml-1 truncate">서울에서 묵은지 두부 김치찌개 맛집</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[쿠팡파트너스]</span> 
-                  <span className="text-black ml-1 truncate">사무실과 집 셋업 (이케아 추천)</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-            </ul>
-          )}
-          {activeTab === 'newComments' && (
-            <ul className="text-sm space-y-2">
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[유튜브]</span> 
-                  <span className="text-black ml-1 truncate">ㅋㅋㅋㅋㅋㅋ</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[갤러리]</span> 
-                  <span className="text-black ml-1 truncate">ㅋㅋㅋㅋㅋㅋ</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[자유게시판]</span> 
-                  <span className="text-black ml-1 truncate">ㅋㅋㅋㅋㅋㅋ</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-              <li className="flex justify-between">
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
-                  <span className="text-red-500 font-semibold">[자유게시판]</span> 
-                  <span className="text-black ml-1 truncate">ㅋㅋㅋㅋㅋㅋ</span>
-                </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">12시간전</span>
-              </li>
-            </ul>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  export default Aside;

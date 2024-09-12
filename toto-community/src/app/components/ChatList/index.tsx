@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import io, { Socket } from "socket.io-client";
+import { v4 as uuidv4 } from 'uuid';  // uuid 임포트
 import dotenv from 'dotenv';
 
 // 소켓과 메시지 타입 정의
@@ -44,8 +45,18 @@ const ChatList = () => {
             socket = io(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}`); // 서버 주소
         }
 
-        if (session?.user?.name) {
-            setUsername(session.user.name);
+        // 유니크한 Guest ID 생성 (localStorage에 저장)
+        const storedGuestId = localStorage.getItem("guestId");
+        if (!storedGuestId) {
+            const uniqueId = `Guest-${uuidv4().slice(0,8)}`;
+            localStorage.setItem("guestId", uniqueId);
+            setUsername(uniqueId);
+        } else {
+            setUsername(storedGuestId);  // 이미 저장된 ID 사용
+        }
+
+        if (session?.user?.nickname) {
+            setUsername(session.user.nickname);
         }
 
         // 서버에서 이전 메시지를 받을 때

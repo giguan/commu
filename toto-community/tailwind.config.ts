@@ -8,6 +8,26 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        bounceIn: {
+          '0%': { transform: 'scale(0) translateY(0) translateX(0)', opacity: '0' },
+          '25%': { transform: 'scale(1.2) translateY(-10px) translateX(-10px)', opacity: '1' },
+          '50%': { transform: 'scale(1.1) translateY(-20px) translateX(10px)', opacity: '1' },
+          '75%': { transform: 'scale(1) translateY(-30px) translateX(-10px)', opacity: '1' },
+          '100%': { transform: 'scale(1) translateY(0) translateX(0)', opacity: '1' },
+        },
+        fadeOut: {
+          '0%': { transform: 'translateY(0) translateX(0)', opacity: '1' },
+          '25%': { transform: 'translateY(-10px) translateX(10px)', opacity: '0.9' },
+          '50%': { transform: 'translateY(-20px) translateX(-10px)', opacity: '0.7' },
+          '75%': { transform: 'translateY(-30px) translateX(10px)', opacity: '0.5' },
+          '100%': { transform: 'translateY(-50px) translateX(-10px)', opacity: '0' },
+        },
+      },
+      animation: {
+        'bounce-in': 'bounceIn 0.5s ease-out forwards',
+        'fade-out': 'fadeOut 0.5s ease-out forwards',
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

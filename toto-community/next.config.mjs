@@ -1,7 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['picsum.photos'],
+    domains: [
+      'picsum.photos',
+      'source.unsplash.com',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3095', // 필요한 경우 포트 번호도 추가
+        pathname: '/uploads/**',
+      },
+    ],
   },
   // async rewrites() {
   //   return [
