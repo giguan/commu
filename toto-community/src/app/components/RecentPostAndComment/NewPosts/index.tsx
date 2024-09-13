@@ -9,7 +9,7 @@ const NewPosts =  ({posts}: {posts: Post[]}) => {
             {posts && posts.slice(0,5).map((post: Post) => (
                 <li key={post.id} className="flex justify-between">
                     <Link href={`/community/${post.id}`}>
-                        <div className="flex items-center whitespace-nowrap max-w-[75%]">
+                        <div className="flex items-center whitespace-nowrap w-60">
                             <span className="text-red-500 font-semibold">[{post.board.name}]</span> 
                             <span className="text-black ml-1 truncate">{post.title}</span>
                         </div>

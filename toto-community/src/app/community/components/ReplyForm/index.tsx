@@ -18,9 +18,14 @@ const ReplyForm = ({ postId }: { postId: number }) => {
     e.preventDefault();
 
 
-    if (!reply) {
+    if (!reply && !selectedImage) {
       toast.error("내용을 입력하세요.");
       return;
+    }
+
+    if(!selectedImage && reply.trim()==="") {
+        toast.error("공백은 입력하실 수 없습니다.");
+        return;
     }
 
     let imageId: number | null = null;
@@ -94,6 +99,13 @@ const ReplyForm = ({ postId }: { postId: number }) => {
   };
 
   const handleRemoveImage = () => {
+
+    // console.log(selectedImage)
+
+    // axios.post(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}/api/common/delete-temp-image`, {
+    //     imageUrl: 
+    // })
+
     setSelectedImage(null);
     setThumbnail(null);
   };

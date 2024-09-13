@@ -7,7 +7,7 @@ const NewComments = ({comments}: {comments: any}) => {
           {comments && comments.slice(0, 5).map((comment: any) => (
             <li key={comment.id} className="flex justify-between">
               <Link href={`/community/${comment.post.id}`}>
-                <div className="flex items-center whitespace-nowrap max-w-[75%]">
+                <div className="flex items-center whitespace-nowrap w-60">
                   <span className="text-red-500 font-semibold">[댓글]</span> 
                   <span className="text-black ml-1 truncate">{comment.content}</span>
                 </div>

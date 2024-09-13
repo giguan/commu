@@ -184,4 +184,45 @@ export class CommentService {
 
     return { message: 'Comment deleted successfully' };
   }
+
+  async deleteCommentImage(commentId: number) {
+    const queryRunner = this.dataSource.createQueryRunner(); // QueryRunner 생성
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const comment = await this.commentRepository.findOne({
+        where: { id: commentId },
+        relations: ['image', 'image.imageDetails'],
+      });
+
+      if (!comment) {
+        throw new Error(`Comment with ID ${commentId} not found.`);
+      }
+
+      // 이미지 및 이미지 디테일 삭제
+      if (comment.image) {
+        // 1. 이미지 디테일 삭제
+        await queryRunner.manager.delete(ImageDetailEntity, {
+          image: comment.image,
+        });
+        // 2. 이미지 삭제
+        await queryRunner.manager.delete(ImageEntity, { id: comment.image.id });
+        // 3. 코멘트의 imageId 필드를 null로 업데이트하여 이미지 참조 삭제
+        await queryRunner.manager.update(
+          Comment,
+          { id: commentId },
+          { imageId: null },
+        );
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+
+    return 'success';
+  }
 }

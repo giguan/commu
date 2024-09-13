@@ -48,9 +48,10 @@ export class Comment {
   @OneToMany(() => Reaction, (reaction) => reaction.comment) // 양방향 관계 설정
   reactions: Reaction[];
 
-  @ManyToOne(() => ImageEntity, { onDelete: 'CASCADE' })
+  // 이미지 엔티티와의 관계에서 onDelete: 'SET NULL' 설정
+  @ManyToOne(() => ImageEntity, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'imageId' })
-  image: ImageEntity; // 이미지 엔티티와 연결
+  image: ImageEntity;
 
   @Column({ nullable: true })
   imageId: number; // 이미지가 있을 때만 저장

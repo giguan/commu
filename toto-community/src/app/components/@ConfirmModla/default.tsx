@@ -3,7 +3,7 @@ interface ModalProps {
     onClose: () => void;
     onConfirm: () => void;
     title: string;
-    content: string;
+    content: any;
   }
   
 

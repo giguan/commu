@@ -72,4 +72,12 @@ export class CommentController {
 
     return res;
   }
+
+  @Post('delete/:commentId')
+  async DleleteCommentImage(@Param('commentId') commentId: number) {
+    console.log('@@@@@@@@@@@@@@');
+
+    const res = await this.commentService.deleteCommentImage(commentId);
+    return res;
+  }
 }

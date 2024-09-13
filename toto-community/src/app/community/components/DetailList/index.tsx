@@ -23,20 +23,26 @@ const formatTimeAgo = (date: string | Date) => {
     return `${daysDifference}일 전`;
   };
 
-const DetailList = ({userRecenPosttList}: {userRecenPosttList: any}) => {
-
+  const DetailList = ({ userRecenPosttList }: { userRecenPosttList: any }) => {
     return (
-        <div className="flex-1 space-y-1 text-sm">
-            {userRecenPosttList.map((item: any) => {
-                return (
-                    <div key={item.id} className="flex justify-between items-center">
-                        <p className="text-gray-700 truncate hover:text-blue-500 hover:font-bold"><Link href={`/community/${item.id}`}>{item.title}</Link></p>
-                        <span className="text-gray-400 text-xs whitespace-nowrap ml-4">{formatTimeAgo(item.createdAt)}</span>
-                    </div>
-                )
-            })}
-        </div>
-    )
-}
+      <ul className="flex-1 space-y-3 text-sm list-none">
+        {userRecenPosttList.map((item: any) => {
+          return (
+            <li
+              key={item.id}
+              className="flex justify-between items-center before:content-['•'] before:text-blue-500 before:mr-2"
+            >
+              <p className="flex-1 min-w-0 text-left text-gray-700 truncate hover:text-blue-500 hover:font-bold">
+                <Link href={`/community/${item.id}`}>{item.title}</Link>
+              </p>
+              <span className="text-gray-400 text-xs whitespace-nowrap ml-4">
+                {formatTimeAgo(item.createdAt)}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
 
 export default React.memo(DetailList);

@@ -7,7 +7,11 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import TextEditor from "@/app/components/@TextEditor/page";
+import dynamic from "next/dynamic";
+
+
+const TextEditor = dynamic(() => import('../../components/@TextEditor/page'), { ssr: false })
+// import TextEditor from "@/app/components/@TextEditor/page";
 
 // 작성할 게시글 데이터 타입 정의
 interface NewPost {
@@ -74,6 +78,8 @@ const PostForm = () => {
       toast.error('로그인이 필요합니다.');
       return;
     }
+
+    
 
     // useMutation 실행 (글 작성)
     createPostMutation.mutate({

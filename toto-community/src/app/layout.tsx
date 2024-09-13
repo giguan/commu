@@ -1,4 +1,5 @@
 "use client"
+import { Session } from "next-auth";
 
 import type { Metadata } from "next";
 // import { SessionProvider } from "next-auth/react";
@@ -21,13 +22,17 @@ const QueryClientProvider = dynamic(() => import('@tanstack/react-query').then(m
 
 const queryClient = getQueryClient();
 
+interface LayoutProps {
+  children: React.ReactNode;
+  session?: Session | null;  // 'session'을 명시적으로 정의
+}
+
 export default function RootLayout({
   children,
   session
-}: {
-  children: React.ReactNode,
-  session: any
-}) {
+}: 
+  LayoutProps
+) {
 
   return (
     <html lang="en">

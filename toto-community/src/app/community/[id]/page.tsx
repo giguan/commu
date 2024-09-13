@@ -14,7 +14,14 @@ import PostList from '../components/PostList';
 import { Post } from '../../../../typings/db';
 import Reply from '../components/Reply';
 
+import Image from 'next/image'
 
+// import md5 from 'md5';
+
+// Gravatar URL 생성 함수
+const getAvatarUrl = (userId: string) => {
+  return `https://robohash.org/${userId}.png?size=200x200`;
+};
 
 const fetchPostById = async (id: number) => {
   const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}/api/post/detail/${id}`);
@@ -68,6 +75,7 @@ const PostDetailPage = () => {
     queryFn: fetchPosts}
   );
 
+
   if (postLoading || recentPostLoading) return <p>Loading...</p>;
   if (postError) return <p>Error loading post: {postError.message}</p>;
   if (recentPostError) return <p>Error loading recent posts: {recentPostError.message}</p>;
@@ -105,10 +113,10 @@ const PostDetailPage = () => {
         <div className="my-4 border-t border-gray-200"></div>
 
         {/* 본문 내용 */}
-        <div className="mb-6 min-h-[200px]">
+        <div className="mb-6 min-h-[200px] p-4">
           <div 
             className="text-gray-800 whitespace-pre-line break-words" 
-            dangerouslySetInnerHTML={{ __html: post.content  }}
+            dangerouslySetInnerHTML={{ __html: post.content }}
             style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
           </div>
         </div>
@@ -116,10 +124,20 @@ const PostDetailPage = () => {
         <DetailBtn postId={postId} authorId={post.author.id} />
 
         <div className="flex justify-between items-start mb-6 space-x-4">
-          <div className="flex-1 flex flex-col items-start space-y-4">
+          {/* 좌측 영역: DetailExp */}
+          <div className="flex-1 w-1/2 flex flex-col items-start space-y-4">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-full flex justify-center items-center">
+              {/* <div className="w-12 h-12 bg-gray-200 rounded-full flex justify-center items-center">
                 <span className="text-black text-lg">🧑‍💼</span>
+              </div> */}
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex justify-center items-center">
+                <Image
+                    src={getAvatarUrl(post.author.id)}
+                    alt="User Avatar"
+                    className="w-full h-full rounded-full"
+                    width={100}
+                    height={100}
+                />
               </div>
               <div>
                 <p className="text-black font-semibold">{post.author.nickname}</p>
@@ -129,7 +147,10 @@ const PostDetailPage = () => {
             <DetailExp userExp={post.author.experience} userLevel={post.author.level} />
           </div>
 
-          <DetailList userRecenPosttList={userRecentPostList} />
+          {/* 우측 영역: DetailList */}
+          <div className="w-1/2">
+            <DetailList userRecenPosttList={userRecentPostList} />
+          </div>
         </div>
 
         <Reply postId={post.id}/>

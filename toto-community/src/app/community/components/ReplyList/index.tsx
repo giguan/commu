@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -15,6 +15,11 @@ import {
     AiFillDislike
 } 
 from "react-icons/ai";
+
+const getAvatarUrl  = (userId: string) => {
+    // Gravatar URL 생성 (특별한 변환 없이 이메일 사용)
+    return `https://robohash.org/${userId}.png?size=200x200`;
+  };
 
 const fetchCommentListByPost = async (id: number) => {
     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}/api/comment/${id}`);
@@ -33,8 +38,17 @@ const ReplyList = ({postId}: {postId: number}) => {
     const [editCommentId, setEditCommentId] = useState<number | null>(null); // 수정 중인 댓글 ID
     const [editContent, setEditContent] = useState<string>("")
 
+    const [modalContent, setModalContent] = useState("");
+
     const [likeAnimating, setLikeAnimating] = useState(false);
     const [dislikeAnimating, setDislikeAnimating] = useState(false);
+
+
+    // 답글 작성할 떄 계속 리랜더링 하니까 답글쪽 작업해야함
+    
+    // const onChangeEditContent = useCallback((e: any) => {
+    //     setEditContent(e.target.value)
+    // }, [editContent])
 
     // 댓글 리스트 가져오기 (useQuery 사용)
     const { data: comments, isLoading: postLoading, error: postError } = useQuery({
@@ -212,7 +226,8 @@ const ReplyList = ({postId}: {postId: number}) => {
         }
     };
 
-    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [isDeleteCommentModalOpen, setDeleteCommentModalOpen] = useState(false);
+    const [isDeleteCommentImageModalOpen, setDeleteCommentImageModalOpen] = useState(false);
 
     // useMutation을 사용하여 삭제 작업 처리
     const deleteCommentMutation = useMutation({
@@ -237,6 +252,8 @@ const ReplyList = ({postId}: {postId: number}) => {
     
     const handleCommentDelete = (commentId: number) => {
 
+        setModalContent("정말로 이 댓글을 삭제하시겠습니까?")
+
         const commentToDelete = comments?.find((comment: any) => comment.id === commentId);
 
         if (commentToDelete && commentToDelete.replies && commentToDelete.replies.length > 0) {
@@ -245,28 +262,76 @@ const ReplyList = ({postId}: {postId: number}) => {
         }
 
         // 삭제 버튼 클릭 시 모달 열기
-        setDeleteModalOpen(true);
+        setDeleteCommentModalOpen(true);
 
         setDeleteCommentId(commentId)
       };
-    
-    const handleCloseModal = () => {
 
-        setDeleteModalOpen(false);
+    const handleConfirmCommentDelete = () => {
+    // 실제 삭제 작업 처리 (API 호출 또는 로직 추가)
+    deleteCommentMutation.mutate(); // 삭제 진행
+    
+    // 모달 닫기
+    setDeleteCommentModalOpen(false);
+};
+    
+    const handleCloseCommentModal = () => {
+        setDeleteCommentModalOpen(false);
     };
     
-    const handleConfirmDelete = () => {
-        // 실제 삭제 작업 처리 (API 호출 또는 로직 추가)
-        deleteCommentMutation.mutate(); // 삭제 진행
-        
+    const [deleteImageCommentId, setDeleteImageCommentId] = useState(0)
+
+    // 이미지 삭제 모달
+
+    const handleCommentImageDelete = (commentId:number) => {
+        setDeleteCommentImageModalOpen(true);
+
+        setDeleteImageCommentId(commentId)
+    }
+
+    const handleCloseCommentImageModal = () => {
+        setDeleteCommentImageModalOpen(false)
+    }
+
+    const handleConfirmCommentImageDelete = async() => {
+        handleImageDelete();
+
         // 모달 닫기
-        setDeleteModalOpen(false);
+        setDeleteCommentImageModalOpen(false);
     };
+
+    const handleImageDelete = async () =>{
+
+        await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_SERVER}/api/comment/delete/${deleteImageCommentId}`)
+            .then((res) => {
+                toast.success("이미지가 삭제되었습니다.")
+                queryClient.invalidateQueries({ queryKey: ["comment", postId] });
+                setDeleteImageCommentId(0)
+            })
+            
+    }
+
+
+    const fileInputRef = useRef(null);
+
+
+    // const handleButtonClick = () => {
+    //     setTimeout(() => {
+    //         const fileInput = document.getElementById(`fileInput-${comment.id}`);
+    //         if (fileInput) {
+    //             fileInput.click();
+    //         }
+    //     }, 0);
+    // };
+
+
+    
 
     if (postLoading) return <p>댓글을 불러오는 중입니다...</p>;
     if (postError) return <p>댓글을 불러오는 중 오류가 발생했습니다.</p>;
 
-    console.log("###########",comments)
+    console.log(comments)
+
 
     return (
         <div>
@@ -276,8 +341,14 @@ const ReplyList = ({postId}: {postId: number}) => {
                 {comments && comments.map((comment: any) => (
                     <div key={comment.id}>
                         <div className="flex items-start space-x-2">
-                            <div className="w-8 h-8 bg-gray-200 rounded-full flex justify-center items-center">
-                                <span className="text-red-600 text-lg">🧑‍💼</span>
+                            <div className="w-12 h-12 bg-gray-200 rounded-full flex justify-center items-center">
+                                <Image
+                                    src={getAvatarUrl(comment.author.id)}
+                                    alt="User Avatar"
+                                    className="w-full h-full rounded-full"
+                                    width={100}
+                                    height={100}
+                                />
                             </div>
                             <div>
                                 <div className="flex items-center">
@@ -303,12 +374,38 @@ const ReplyList = ({postId}: {postId: number}) => {
                                 {/* 수정 모드인지 확인 */}
                                 {editCommentId === comment.id ? (
                                     <form onSubmit={(e) => handleEditSubmit(e, comment.id)}>
+                                        {comment.image && 
+                                        <div className="relative inline-block">
+                                            <Image
+                                                src={process.env.NEXT_PUBLIC_BACKEND_SERVER + comment.image?.imageDetails[0].url}
+                                                alt={""}
+                                                width={150}
+                                                height={150}
+                                                layout="responsive"
+                                                className="rounded-md m-1"
+                                            />
+                                    
+                                            {/* 수정 및 삭제 버튼을 중앙에 배치 */}
+                                            <div className="absolute inset-0 flex justify-center items-center space-x-4">
+                                                {/* 삭제 버튼 */}
+                                                <button
+                                                    type="button"
+                                                    className="bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600 transition-all duration-300"
+                                                    onClick={() => handleCommentImageDelete(comment.id)} // 이미지 삭제 로직 추가
+                                                >
+                                                    <AiOutlineDelete size={18}/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        }
+                                    
                                         <textarea
                                             className="w-full p-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                                             rows={2}
                                             value={editContent}
                                             onChange={(e) => setEditContent(e.target.value)}
                                         ></textarea>
+                                        
                                         <div className="flex justify-end">
                                             <button
                                                 type="submit"
@@ -327,6 +424,9 @@ const ReplyList = ({postId}: {postId: number}) => {
                                                 alt={""}
                                                 width={100}
                                                 height={100}
+                                                layout="responsive"
+                                                objectFit="cover"
+                                                className="rounded-md m-1 w-4 h-4"
                                             />
                                         )}
                                         {comment.content}
@@ -484,17 +584,42 @@ const ReplyList = ({postId}: {postId: number}) => {
                     </div>
                 ))}
 
-                {/* 모달 컴포넌트 */}
+                {/* 답글 삭제 모달 컴포넌트 */}
                 <Modal 
-                    isOpen={isDeleteModalOpen} 
-                    onClose={handleCloseModal} 
-                    onConfirm={handleConfirmDelete} 
+                    isOpen={isDeleteCommentModalOpen} 
+                    onClose={handleCloseCommentModal} 
+                    onConfirm={handleConfirmCommentDelete} 
                     title="삭제 확인" 
-                    content="정말로 이 댓글을 삭제하시겠습니까?" 
+                    content={
+                        <>
+                            정말로 답글을 삭제 하시겠습니까?<br/>
+                            삭제된 답글은 복구 할 수 없습니다.
+                        </>
+                    } 
                 />
+
+                {/* 답글 이미지 삭제 모달 컴포넌트 */}
+                <Modal 
+                    isOpen={isDeleteCommentImageModalOpen} 
+                    onClose={handleCloseCommentImageModal} 
+                    onConfirm={handleConfirmCommentImageDelete} 
+                    title="삭제 확인" 
+                    content={
+                        <>
+                            정말로 이미지를 삭제 하시겠습니까?<br/>
+                            삭제된 이미지는 복구 할 수 없습니다.
+                        </>
+                    }
+                />
+
             </div>
         </div>
     )
+}
+
+
+export const EditMode = () => {
+    return
 }
 
 export default ReplyList;

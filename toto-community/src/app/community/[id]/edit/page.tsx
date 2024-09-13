@@ -4,13 +4,13 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
-import TextEditor from "@/app/components/@TextEditor/page";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import PostCategory from "../../components/PostCatogory";
 import { Post } from "../../../../../typings/db";
 import { getQueryClient } from "@/app/utils/queryHelpers";
-
+import dynamic from "next/dynamic";
+const TextEditor = dynamic(() => import('../../../components/@TextEditor/page'), { ssr: false })
 
 // 작성할 게시글 데이터 타입 정의
 interface NewPost {
@@ -54,7 +54,6 @@ const PostEditPage = () => {
         enabled: !!postId,
       });
 
-      console.log("%%%%%%%%%%%%%%",post)
 
     const [category, setCategory] = useState<number | null>();
     const [title, setTitle] = useState();

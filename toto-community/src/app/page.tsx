@@ -57,7 +57,7 @@ export default async function Home() {
           {/* 자유게시판 및 갤러리 위젯들 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 자유게시판 위젯 */}
-                <PostWidget initialPosts={posts} />
+                <PostWidget initialPosts={posts} title={"자유게시판"} />
             
             {/* 갤러리 위젯 */}
             <div className="bg-white p-4 rounded-lg shadow-md">
@@ -221,6 +221,7 @@ export default async function Home() {
               </div>
             </div>
 
+            <PostWidget initialPosts={posts} title={"뉴스"}/>
             {/* 뉴스 위젯 */}
             <div className="bg-white p-4 rounded-lg shadow-md">
               <div className="flex justify-between items-center mb-4">

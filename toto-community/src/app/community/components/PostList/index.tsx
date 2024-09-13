@@ -42,6 +42,12 @@ const PostList = ({ posts }: {posts: Post[]}) => {
 
   const displayPosts = queryData || posts;
 
+  const extractBase64Image = (content: string): string | null => {
+    const base64Regex = /data:image\/[a-zA-Z]+;base64,[^\"]+/g; // base64 이미지 정규식
+    const matches = content.match(base64Regex); // 이미지 부분만 추출
+    return matches ? matches[0] : null; // 첫 번째 이미지만 반환
+  };
+
   return (
     <>
         <div className="lg:flex-grow space-y-6">
@@ -69,36 +75,56 @@ const PostList = ({ posts }: {posts: Post[]}) => {
                         displayPosts
                         ?.filter((post) => category === 1 || post.board.id === category)
                         .map((post) => (
+                            
                             <li key={post.id} className="flex justify-between items-center p-2 rounded-lg">
-                            <div>
-                                <div className="flex items-center space-x-2 mb-1">
-                                <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-lg font-bold">{post.board.name}</span>
-                                <Link href={`/community/${post.id}`} className="text-black text-medium font-bold hover:text-primary-main truncate">
-                                    {post.title}
-                                </Link>
-                                {isNew(post.createdAt) && (
-                                    <span className="text-red-500 text-xs font-bold ml-2">N</span>
+                                <div className="flex-grow min-w-0">
+                                    <div className="flex items-center space-x-2 mb-1">
+                                    <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-lg font-bold w-12 flex justify-center">
+                                        {post.board.name}
+                                    </span>
+
+                                    {/* 텍스트가 넘치지 않게 flex-grow와 truncate 사용 */}
+                                    <Link
+                                        href={`/community/${post.id}`}
+                                        className="text-black text-medium font-bold mb-1 truncate hover:text-primary-main flex-grow"
+                                        style={{ minWidth: "0", maxWidth: "100%" }}
+                                    >
+                                        {post.title}
+                                    </Link>
+                                    
+                                    {/* New 마크 */}
+                                    {isNew(post.createdAt) && (
+                                        <span className="text-red-500 text-xs font-bold ml-2">N</span>
+                                    )}
+                                    </div>
+
+                                    <div className="text-xs text-gray-500 space-x-2 mb-1">
+                                    <span>{post.author.nickname}</span>
+                                    <span>조회수 {post.views}</span>
+                                    <span>좋아요 {post.likes}</span>
+                                    <span>싫어요 {post.dislikes}</span>
+                                    <span>🗨️ {post.commentCount}</span>
+                                    </div>
+
+                                    <div className="text-xs text-gray-500 space-x-2">
+                                    <span>{format(new Date(post.createdAt), 'yyyy-MM-dd HH:mm')}</span>
+                                    </div>
+                                </div>
+
+                                {/* 이미지가 부모 요소를 넘지 않도록 설정 */}
+                                {extractBase64Image(post.content) && (
+                                    <div className="w-12 h-12 ml-4 shrink-0">
+                                    <Image
+                                        src={extractBase64Image(post.content) as string} // base64 이미지 추출 함수 사용
+                                        alt="게시글 썸네일 이미지"
+                                        width={400}
+                                        height={400}
+                                        objectFit="cover"
+                                        className="rounded-lg"
+                                    />
+                                    </div>
                                 )}
-                                </div>
-                                <div className="text-xs text-gray-500 space-x-2">
-                                <span>{post.author.nickname}</span>
-                                <span>조회수 {post.views}</span>
-                                <span>좋아요 {post.likes}</span>
-                                <span>싫어요 {post.dislikes}</span>
-                                <span>🗨️ {post.commentCount}</span>
-                                <span>{format(new Date(post.createdAt), 'yyyy-MM-dd HH:mm')}</span>
-                                </div>
-                            </div>
-                            <div className="w-12 h-12">
-                                <Image 
-                                src={"https://picsum.photos/250/250"} 
-                                alt={"게시글 썸네일 이미지"}    
-                                width={100}
-                                height={100}   
-                                className="rounded-lg"                         
-                                />
-                            </div>
-                            </li>
+                                </li>
                         ))
                     )}
                     </ul>
